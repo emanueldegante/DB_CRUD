@@ -43,9 +43,30 @@ def fetch_data(query, params=()):
 
     return df.to_dict('records')
 
+def calculate_duration(logindate, logintime, logoutdate, logouttime):
+    try:
+        # Combine date + time into full datetime
+        login_dt = datetime.strptime(f"{logindate} {logintime}", "%Y-%m-%d %H:%M")
+        logout_dt = datetime.strptime(f"{logoutdate} {logouttime}", "%Y-%m-%d %H:%M")
+
+        # Compute difference
+        duration = logout_dt - login_dt
+
+        # Convert to hours and minutes
+        total_minutes = int(duration.total_seconds() / 60)
+        hours = total_minutes // 60
+        minutes = total_minutes % 60
+
+        return f"{hours}h {minutes}m"
+    
+    except Exception as e:
+        print("Error calculating duration:", e)
+        return None
+
+
 # ---------------- LAYOUT ----------------
 app.layout = dbc.Container([
-    html.H2("Patient Management System"),
+    html.H2("ClockIn ClockOut Job Record"),
 
     dbc.Row([
         dbc.Col([
@@ -142,9 +163,9 @@ def load_user(n, lid):
 )
 def save(n, name, logindate, logintime, logoutdate,logouttime, notes):
     cursor.execute("""
-    INSERT INTO records (id, name, logindate, logintime, logoutdate, logouttime, notes)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (n, name, logindate, logintime, logoutdate,logouttime, notes))
+    INSERT INTO records (name, logindate, logintime, logoutdate, logouttime, notes)
+    VALUES (?, ?, ?, ?, ?, ?)
+    """, (name, logindate, logintime, logoutdate,logouttime, notes))
     conn.commit()
     return fetch_data("SELECT * FROM records")
 

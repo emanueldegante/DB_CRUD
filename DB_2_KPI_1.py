@@ -52,7 +52,7 @@ app.layout = dbc.Container([
 
     html.Br(),
 
-    # -------- KPI CARDS --------
+ # -------- KPI CARDS --------
     dbc.Row([
         dbc.Col(dbc.Card([dbc.CardBody([
             html.H6("Total Cost"),
