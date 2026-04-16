@@ -10,6 +10,7 @@ import pandas as pd
 from dash import Dash, html, dcc, Input, Output, State, dash_table, ctx
 import dash_bootstrap_components as dbc
 from datetime import datetime
+import traceback
 
 # ---------------- DATABASE ----------------
 conn = sqlite3.connect("records.db", check_same_thread=False)
@@ -161,12 +162,19 @@ def load_user(n, lid):
     State('notes', 'value'),
     prevent_initial_call=True
 )
-def save(n, name, logindate, logintime, logoutdate,logouttime, notes):
-    cursor.execute("""
-    INSERT INTO records (name, logindate, logintime, logoutdate, logouttime, notes)
-    VALUES (?, ?, ?, ?, ?, ?)
-    """, (name, logindate, logintime, logoutdate,logouttime, notes))
-    conn.commit()
+def save(n, name, logindate, logintime, logoutdate, logouttime, notes):
+    try:
+        cursor.execute("""
+            INSERT INTO records (name, logindate, logintime, logoutdate, logouttime, notes)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (name, logindate, logintime, logoutdate, logouttime, notes))
+
+        conn.commit()
+
+    except Exception as e:
+        print("ERROR:", e)
+        traceback.print_exc()
+
     return fetch_data("SELECT * FROM records")
 
 # Delete row (PROFESSIONAL UX)
